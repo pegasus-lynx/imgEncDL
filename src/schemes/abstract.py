@@ -1,8 +1,8 @@
 
 class AbstractScheme(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, name:str):
+        self.name = name
 
     def encrypt():
         pass

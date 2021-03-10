@@ -27,7 +27,7 @@ class Dataset(object):
         if not isinstance(img, Image):
             img = Image.load(img)
         if isinstance(label, str):
-            lebel = self._get_label(label)
+            label = self._get_label(label)
         self.images.append(img)
         self.labels.append(label)
 
@@ -71,6 +71,12 @@ class Image(object):
     def view(self):
         viewer = ImageViewer(self.array)
         viewer.show()
+
+    @property
+    def fname(self):
+        if self.filepath:
+            return self.filepath.name()
+        return None
 
     @classmethod
     def load(cls, img):

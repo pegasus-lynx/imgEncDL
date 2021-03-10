@@ -16,4 +16,4 @@ def decode_list(array:List[ByteString]):
     return list(map(lambda x: x.decode('utf-8'), array))
 
 def encode_list(array:List[str]):
-    return list(map(labmbda x: x.encode(), array))
+    return list(map(lambda x: x.encode(), array))
