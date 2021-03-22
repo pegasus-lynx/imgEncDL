@@ -1,3 +1,4 @@
+from .etc import EtCScheme
 
 class SchemeRegistry(object):
     schemes = ['ele', 'etc', 'tanaka', 'skk', 'skkd']
@@ -5,7 +6,7 @@ class SchemeRegistry(object):
 class SchemeFactory(object):
     
     @classmethod
-    def get_scheme(cls, scheme:str=None):
+    def get_scheme(cls, scheme:str=None, **kwargs):
         if not scheme:
             print(f'No scheme set. Specify the scheme from the \
                     following : {" ".join(SchemeRegistry.schemes)}')
@@ -16,7 +17,9 @@ class SchemeFactory(object):
         if scheme == 'ele':
             pass
         elif scheme == 'etc':
-            pass
+            assert kwargs.get('block_shape')
+            assert kwargs.get('nblocks')
+            return EtCScheme(kwargs.get('block_shape'), nblocks=kwargs.get('nblocks'))
         elif scheme == 'skk':
             pass
         elif scheme == 'skkd':

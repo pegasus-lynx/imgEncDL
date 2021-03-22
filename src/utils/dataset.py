@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 from pathlib import Path
 from typing import Union, Dict, List, Tuple
+from .functionals import Transformer
 
 class Dataset(object):
     
@@ -57,13 +58,14 @@ class Image(object):
         self.filepath = filepath
         self.array = nparray
         self.transforms = []
-        if filepath and not nparray:
+        if filepath and nparray is None:
             self._read()
 
     def shape(self):
-        if self.array:
+        try:
             return self.array.shape
-        return ()
+        except Exception as _:
+            return ()
 
     def _read(self):
         self.array = imgio.imread(fname=self.filepath)        
@@ -75,7 +77,7 @@ class Image(object):
     @property
     def fname(self):
         if self.filepath:
-            return self.filepath.name()
+            return self.filepath.name
         return None
 
     @classmethod
@@ -93,18 +95,14 @@ class Image(object):
             save_path = img.filepath
         imgio.imsave(fname=save_path, arr=img.array)
 
-    def rescale(self, scale_factor:float=1.0):
-        self.transforms.append(f'rescale {scale_factor}')
-        self.array = rescale(self.array, scale_factor, anti_aliasing=False)
+    def rescale(self, scale_factor:float=1.0, anti_aliasing:bool=True):
+        self.array = Transformer.rescale(self.array, scale_factor, anti_aliasing=anti_aliasing)
 
-    def resize(self, shape:Tuple[int]):
-        self.transforms.append(f'resize {shape}')
-        self.array = resize(self.array, shape, anti_aliasing=True)
+    def resize(self, shape:Tuple[int], anti_aliasing:bool=True):
+        self.array = Transformer.resize(self.array, shape, anti_aliasing=anti_aliasing)
 
     def downscale(self, downscale_factor:Tuple[int]):
-        self.transforms.append(f'downscale {downscale_factor}')
-        self.array = downscale_local_mean(self.array, downscale_factor)
+        self.array = Transformer.downscale(self.array, downscale_factor)
 
     def togray(self):
-        self.transforms.append('togray')
-        self.array = color.rgb2gray(self.array)
+        self.array = Transformer.togray(self.array)

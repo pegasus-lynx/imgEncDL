@@ -4,14 +4,14 @@ class AbstractScheme(object):
     def __init__(self, name:str):
         self.name = name
 
-    def encrypt():
+    def encrypt(self):
         pass
 
-    def decrypt():
+    def decrypt(sell):
         pass
 
-    def save():
+    def save(self):
         pass
 
-    def read():
+    def read(self):
         pass
