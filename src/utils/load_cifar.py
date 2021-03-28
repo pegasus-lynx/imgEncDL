@@ -4,7 +4,7 @@ from typing import Union, ByteString
 import numpy as np
 from typing import Union, Tuple, Dict
 from src import Filepath
-from src.utils import maybe_to_path, decode_list, make_dir
+from src.utils import maybe_to_path, decode_list, make_dir, _load_file
 from src.utils.dataset import Image, Dataset
 
 def load_cifar(name:str, dir_path:Filepath=None):
@@ -90,9 +90,3 @@ def _load_cifar_datafile(fpath:Filepath, keys:Dict[str,ByteString],
         img = Image(Path(fname),imgarr)
         dataset.append(img,label)
     return dataset
-
-
-def _load_file(fpath:Filepath):
-    with open(fpath, 'rb') as fr:
-        data = pickle.load(fr, encoding='bytes')
-    return data

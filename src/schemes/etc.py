@@ -2,6 +2,7 @@ from .abstract import AbstractScheme
 from ..utils.random import RandomGen
 from typing import Union, Tuple
 from ..utils.dataset import Image
+from ..utils import _load_file
 from ..utils.functionals import Transformer
 import numpy as np
 
@@ -41,11 +42,22 @@ class EtCScheme(AbstractScheme):
         arr = self._merge_blocks(blocks)
         return Image(nparray=arr)
 
-    def save(self):
-        pass
+    @classmethod
+    def save(cls, scheme, work_dir):
+        data = {
+            'name' : scheme.name,
+            'nblocks' : scheme.nblocks,
+            'block_shape' : scheme.block_shape,
+            'keys' : scheme.keys 
+        }
+        pickle.dump(data, work_dir / Path(f'{scheme.name}.scheme.file'))
 
-    def load(self):
-        pass
+    @classmethod
+    def load(cls, load_file):
+        data = _load_file(load_file)
+        scheme = cls(data[b'block_shape'], data[b'nblocks'])
+        scheme.keys = data[b'keys']
+        return scheme
 
     def _make_blocks(self, nparr):
         img_shape = nparr.shape

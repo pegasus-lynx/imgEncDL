@@ -1,5 +1,8 @@
+import pickle
+from typing import ByteString, List
+
 from src import Filepath
-from typing import List, ByteString
+                                                                                                                                                                                
 
 def maybe_to_path(path:Filepath):
     if isinstance(path, str):
@@ -17,3 +20,8 @@ def decode_list(array:List[ByteString]):
 
 def encode_list(array:List[str]):
     return list(map(lambda x: x.encode(), array))
+
+def _load_file(fpath:Filepath)
+    with open(fpath, 'rb') as fr:
+        data = pickle.load(fr, encoding='bytes')
+    return data
