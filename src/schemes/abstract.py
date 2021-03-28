@@ -7,7 +7,7 @@ class AbstractScheme(object):
     def encrypt(self):
         pass
 
-    def decrypt(sell):
+    def decrypt(self):
         pass
 
     def save(self):

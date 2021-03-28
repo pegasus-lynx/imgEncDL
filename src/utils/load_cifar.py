@@ -2,7 +2,7 @@ import pickle
 from pathlib import Path
 from typing import Union, ByteString
 import numpy as np
-
+from typing import Union, Tuple, Dict
 from src import Filepath
 from src.utils import maybe_to_path, decode_list, make_dir
 from src.utils.dataset import Image, Dataset
@@ -92,7 +92,7 @@ def _load_cifar_datafile(fpath:Filepath, keys:Dict[str,ByteString],
     return dataset
 
 
-def _load_file(fpath:Filepath)
+def _load_file(fpath:Filepath):
     with open(fpath, 'rb') as fr:
         data = pickle.load(fr, encoding='bytes')
     return data
