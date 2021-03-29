@@ -5,19 +5,15 @@ from copy import deepcopy
 import math
 from itertools import permutations,product
 from ..utils.dataset import Image
-from tqdm import tqdm
+import pickle
+from ..utils import _load_file
+from pathlib import Path
 class SkkScheme(AbstractScheme):
-    def __init__(self,key:Union[int,None]):
+    def __init__(self):
         self.name='skk'
-        if isinstance(key,int):
-            self.key=key
-    def encrypt(self,img,key:Union[int,None]):
-        if isinstance(key,int):
-            np.random.seed(key)
-        elif hasattr(self,'key'):
-            np.random.seed(self.key)
-        else:
-            raise Exception("no key provided")
+        self.key=np.random.randint(0,(1<<32))
+    def encrypt(self,img):
+        np.random.seed(self.key)
         n=len(img.array)
         m=len(img.array[0])
         flip=np.random.randint(0,8,n*m)
@@ -36,13 +32,8 @@ class SkkScheme(AbstractScheme):
                 arr[i][j][2]=255^(arr[i][j][2])
             arr[i][j]=np.array(list(permutations(arr[i][j]))[xs])
         return Image(filepath=img.filepath.with_suffix('.skk.jpeg'), nparray=arr)
-    def decrypt(self,img,key:Union[int,None]):
-        if isinstance(key,int):
-            np.random.seed(key)
-        elif hasattr(self,'key'):
-            np.random.seed(self.key)
-        else:
-            raise Exception("no key provided")
+    def decrypt(self,img):
+        np.random.seed(self.key)
         n=len(img.array)
         m=len(img.array[0])
         flip=np.random.randint(0,8,n*m)
@@ -65,3 +56,15 @@ class SkkScheme(AbstractScheme):
             if xb:
                 arr[i][j][2]=255^(arr[i][j][2])
         return Image(nparray=arr)
+    def save(self,work_dir):
+        data={
+            'name':self.name,
+            'key':self.key
+        }
+        pickle.dump(data,work_dir / Path(f'{self.name}.scheme.file'))
+    @classmethod
+    def load(cls,load_file):
+        data=_load_file(load_file)
+        scheme=cls()
+        scheme.key=data[b'key']
+        
