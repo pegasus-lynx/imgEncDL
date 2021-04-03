@@ -3,6 +3,22 @@ from skimage.transform import rescale, resize, downscale_local_mean
 from typing import Tuple
 import numpy as np
 
+class Converter(object):
+
+    @classmethod
+    def list2numpy(cls, mat, dtype='long'):
+        mat = np.asarray(mat)
+        if dtype == 'long':
+            mat = mat.astype(np.long)
+        else:
+            mat = mat.astype(np.float)
+        return mat
+
+
+    @classmethod
+    def list2tensor(cls, mat, dtype='long', gpu:int=-1, requires_grad:bool=False):
+        nmat = cls.list2numpy(mat, dtype=dtype)
+
 class Transformer(object):
     @classmethod
     def rescale(cls, array, scale_factor:float=1.0, anti_aliasing:bool=True):

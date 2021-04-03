@@ -4,7 +4,7 @@ from typing import Union, ByteString
 import numpy as np
 from typing import Union, Tuple, Dict
 from src import Filepath
-from src.utils import maybe_to_path, decode_list, make_dir, _load_file
+from src.utils import ensure_path, decode_list, ensure_dir, _load_file
 from src.utils.dataset import Image, Dataset
 
 def load_cifar(name:str, dir_path:Filepath=None):
@@ -19,10 +19,10 @@ def load_cifar(name:str, dir_path:Filepath=None):
         return load_cifar_100(dir_path)
 
 def load_cifar_10(dir_path:Filepath):
-    dir_path = maybe_to_path(dir_path)
+    dir_path = ensure_path(dir_path)
     assert dir_path.exists(), f'Given path  {dir_path} does not exist'
 
-    # img_dir = make_dir(dir_path / Path('images'))
+    # img_dir = ensure_dir(dir_path / Path('images'))
 
     meta_file = dir_path / Path('batches.meta')
     meta = _load_file(meta_file)
@@ -49,10 +49,10 @@ def load_cifar_10(dir_path:Filepath):
     return train_ds, test_ds
 
 def load_cifar_100(dir_path:Filepath, label_type:str='fine'):
-    dir_path = maybe_to_path(dir_path)
+    dir_path = ensure_path(dir_path)
     assert dir_path.exists(), f'Given path  {dir_path} does not exist'
 
-    # img_dir = make_dir(dir_path / Path('images'))
+    # img_dir = ensure_dir(dir_path / Path('images'))
 
     meta_file = dir_path / Path('meta')
     meta = _load_file(meta_file)

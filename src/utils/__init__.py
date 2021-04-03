@@ -4,13 +4,13 @@ from typing import ByteString, List
 from src import Filepath
 from pathlib import Path                                                                                                                                                                          
 
-def maybe_to_path(path:Filepath):
+def ensure_path(path:Filepath):
     if isinstance(path, str):
         return Path(path)
     return path
 
-def make_dir(path:Filepath):
-    path = maybe_to_path(path)
+def ensure_dir(path:Filepath):
+    path = ensure_path(path)
     if not path.exists():
         path.mkdir()
     return path
