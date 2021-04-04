@@ -1,4 +1,5 @@
 from .etc import EtCScheme
+from .tanaka import TanakaScheme
 
 class SchemeRegistry(object):
     schemes = ['ele', 'etc', 'tanaka', 'skk', 'skkd']
@@ -11,7 +12,7 @@ class SchemeFactory(object):
             print(f'No scheme set. Specify the scheme from the \
                     following : {" ".join(SchemeRegistry.schemes)}')
         if not cls.validate_scheme(scheme):
-            print(f'Scheme {scheme} is not a vaid option.')
+            print(f'Scheme {scheme} is not a valid option.')
             return None
 
         if scheme == 'ele':
@@ -25,7 +26,7 @@ class SchemeFactory(object):
         elif scheme == 'skkd':
             pass
         elif scheme == 'tanaka':
-            pass
+            return TanakaScheme()
 
         return None
 
