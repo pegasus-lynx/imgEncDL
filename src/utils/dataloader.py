@@ -37,7 +37,7 @@ class DataLoader(object):
             classes.append(label)
             curr += 1
         if curr != 0:
-            img_tensor = Cr.list2tensor(imgs, dtype='float', gpu=self.gpu)
+            img_tensor = Cr.list2tensor(images, dtype='float', gpu=self.gpu)
             cls_tensor = Cr.list2tensor(classes, gpu=self.gpu)
             yield (imgs, classes)
 
