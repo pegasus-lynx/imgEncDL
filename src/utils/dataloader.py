@@ -31,7 +31,7 @@ class DataLoader(object):
                 cls_tensor = Cr.list2tensor(classes, gpu=self.gpu)
                 yield (img_tensor, cls_tensor)
                 curr = 0
-                imgs, classes = [], []        
+                images, classes = [], []        
             img, label = self.dataset._get_row(p)
             images.append(img.array)
             classes.append(label)
