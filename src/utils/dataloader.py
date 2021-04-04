@@ -8,7 +8,7 @@ class DataLoader(object):
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.dataset = dataset
-        self.permutation = None
+        self.permutation = list(range(len(dataset)))
 
         if shuffle:
             self.shuffle = True
@@ -25,8 +25,9 @@ class DataLoader(object):
         images, classes = [], []
         curr = 0
         for p in self.permutation:
-            if curr = self.batch_size:
-                img_tensor = Cr.list2tensor(imgs, dtype='float', gpu=self.gpu)
+            if curr == self.batch_size:
+                # print(len(images), images[0].shape)
+                img_tensor = Cr.list2tensor(images, dtype='float', gpu=self.gpu)
                 cls_tensor = Cr.list2tensor(classes, gpu=self.gpu)
                 yield (img_tensor, cls_tensor)
                 curr = 0

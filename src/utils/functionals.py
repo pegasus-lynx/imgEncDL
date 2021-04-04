@@ -2,6 +2,7 @@ from skimage import color
 from skimage.transform import rescale, resize, downscale_local_mean
 from typing import Tuple
 import numpy as np
+import torch
 
 class Converter(object):
 
@@ -11,13 +12,23 @@ class Converter(object):
         if dtype == 'long':
             mat = mat.astype(np.long)
         else:
-            mat = mat.astype(np.float)
+            mat = mat.astype(np.double)
         return mat
 
 
     @classmethod
     def list2tensor(cls, mat, dtype='long', gpu:int=-1, requires_grad:bool=False):
         nmat = cls.list2numpy(mat, dtype=dtype)
+        tmat = torch.from_numpy(nmat)
+        if dtype == 'long':
+            tmat = tmat.long()
+        else:
+            tmat = tmat.float()
+        if requires_grad:
+            tmat.requires_grad_ = True
+        if gpu >= 0:
+            tmat = tmat.cuda(gpu)
+        return tmat
 
 class Transformer(object):
     @classmethod

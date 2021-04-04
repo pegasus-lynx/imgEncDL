@@ -1,7 +1,13 @@
 from typing import Tuple, Optional, List
 from pathlib import Path
+from src.utils import ensure_path
+from src import yaml
 
-def load_conf
+def load_conf(conf_file):
+    conf_file = ensure_path(conf_file)
+    with open(conf_file, 'r') as fr:
+        config = yaml.load(fr)
+    return config
 
 class PathFuncs(object):
     @classmethod

@@ -79,7 +79,7 @@ def load_cifar_100(dir_path:Filepath, label_type:str='fine'):
 def _load_cifar_datafile(fpath:Filepath, keys:Dict[str,ByteString], 
                         shape:Tuple[int]=(32,32,3)):
     data = _load_file(fpath)
-    length = len(data[keys[b'labels']])
+    length = len(data[keys['labels']])
     dataset = Dataset()
     for p in range(length):
         fname = data[keys['fnames']][p].decode('utf-8')

@@ -1,4 +1,4 @@
-
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,10 +9,16 @@ class ShakeDropFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x, training=True, p_drop=0.5, alpha_range=[-1, 1]):
         if training:
-            gate = torch.cuda.FloatTensor([0]).bernoulli_(1 - p_drop)
+            if torch.cuda.is_available():
+                gate = torch.cuda.FloatTensor([0]).bernoulli_(1 - p_drop)
+            else:
+                gate = torch.FloatTensor([0]).bernoulli_(1 - p_drop)            
             ctx.save_for_backward(gate)
             if gate.item() == 0:
-                alpha = torch.cuda.FloatTensor(x.size(0)).uniform_(*alpha_range)
+                if torch.cuda.is_available():
+                    alpha = torch.cuda.FloatTensor(x.size(0)).uniform_(*alpha_range)
+                else:
+                    alpha = torch.FloatTensor(x.size(0)).uniform_(*alpha_range)
                 alpha = alpha.view(alpha.size(0), 1, 1, 1).expand_as(x)
                 return alpha * x
             else:
@@ -24,7 +30,10 @@ class ShakeDropFunction(torch.autograd.Function):
     def backward(ctx, grad_output):
         gate = ctx.saved_tensors[0]
         if gate.item() == 0:
-            beta = torch.cuda.FloatTensor(grad_output.size(0)).uniform_(0, 1)
+            if torch.cuda.is_available():
+                beta = torch.cuda.FloatTensor(grad_output.size(0)).uniform_(0, 1)
+            else:
+                beta = torch.FloatTensor(grad_output.size(0)).uniform_(0, 1)
             beta = beta.view(beta.size(0), 1, 1, 1).expand_as(grad_output)
             beta = Variable(beta)
             return beta * grad_output, None, None, None
@@ -45,8 +54,9 @@ class ShakeDrop(nn.Module):
 
 class ShakeUnit(nn.Module):
 
-    def __init__(self, in_channel, out_channel, stride=1, p_shakedrop=1.0):
+    def __init__(self, in_channel, out_channel, stride=1, p_shakedrop=1.0, gpu=-1):
         super(ShakeUnit, self).__init__()
+        self.gpu = gpu
         self.downsampled = stride == 2
         self.branch = self._make_branch(in_channel, out_channel, stride=stride)
         self.shortcut = not self.downsampled and None or nn.AvgPool2d(2)
@@ -56,14 +66,17 @@ class ShakeUnit(nn.Module):
         h = self.branch(x)
         h = self.shake_drop(h)
         h0 = x if not self.downsampled else self.shortcut(x)
-        pad_zero = Variable(torch.zeros(h0.size(0), h.size(1)-h0.size(1), h0.size(2), h0.size(3)).float()).cuda()
+        if self.gpu > -1:
+            pad_zero = Variable(torch.zeros(h0.size(0), h.size(1)-h0.size(1), h0.size(2), h0.size(3)).float()).cuda()
+        else:
+            pad_zero = Variable(torch.zeros(h0.size(0), h.size(1)-h0.size(1), h0.size(2), h0.size(3)).float())
         h0 = torch.cat([h0, pad_zero], dim=1)
         return h + h0
 
     def _make_branch(self, in_channel, out_channel, stride=1):
         return nn.Sequential(
             nn.BatchNorm2d(in_channel),
-            nn.Conv2d(in_channel, out_channel, 3, padding=1, stride=stride, bias=False)
+            nn.Conv2d(in_channel, out_channel, 3, padding=1, stride=stride, bias=False),
             nn.BatchNorm2d(out_channel),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_channel, out_channel, 3, padding=1, stride=1, bias=False),
@@ -72,8 +85,10 @@ class ShakeUnit(nn.Module):
     
 class ShakePyramidNet(nn.Module):
 
-    def __init__(self, depth=110, alpha=270, label=10):
+    def __init__(self, depth=110, alpha=270, label=10, gpu:int=-1):
         super(ShakePyramidNet, self).__init__()
+
+        self.gpu = gpu
         in_channel = 16
         n_units = (depth-2)//6
         in_channels = [in_channel] + [in_channel + math.ceil((alpha / (3*n_units)) * (i+1)) for i in range(3*n_units) ]
@@ -101,6 +116,7 @@ class ShakePyramidNet(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
+        x = x.permute(0,3,1,2)
         h = self.bn_in(self.c_in(x))
         h = self.layer1(h)
         h = self.layer2(h)
@@ -115,6 +131,6 @@ class ShakePyramidNet(nn.Module):
         layers = []
         for i in range(int(n_units)):
             layers.append(block(self.in_channels[self.u_idx], self.in_channels[self.u_idx+1],
-                                stride, self.ps_shakedrop[self.u_idx]))
+                                stride, self.ps_shakedrop[self.u_idx], gpu=self.gpu))
             self.u_idx, stride = self.u_idx + 1, 1
         return nn.Sequential(*layers)

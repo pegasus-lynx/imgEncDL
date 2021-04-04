@@ -10,22 +10,28 @@ from src.utils.dataloader import DataLoader
 from src.utils.load_cifar import load_cifar
 from src.models import PathFuncs as Pf
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
+# import torch.backends.cudnn as cudnn
+
 class ImgRecExperiment(object):
 
     def __init__(self, work_dir:Path, config=None):
         
-        self.work_dir = ensure_dir(path)
+        self.work_dir = ensure_dir(work_dir)
         self.model_dir = self.work_dir / 'models'
 
         self._conf_file = self.work_dir / 'conf.yml'
         self.score_file = self.model_dir / 'scores.tsv'
 
-
         if isinstance(config, str) or isinstance(config, Path):
             config = load_conf(config)
-        self.config = config
+        self.config = config if config else load_conf(self._conf_file)
 
         self._trained_file = self.work_dir / '_TRAINED'
+
+        self.device, self.gpu = self._set_device()
 
     @property
     def model_args(self):
@@ -35,6 +41,19 @@ class ImgRecExperiment(object):
     def optim_args(self):
         return self.config.get('optim_args')
 
+    @property
+    def train_args(self):
+        return self.config.get('train_args')
+
+    @property
+    def data_args(self):
+        return self.config.get('data_args')
+
+    def _set_device(self):
+        if torch.cuda.is_available():
+            return 'cuda:0', 0
+        return 'cpu', -1
+
     def has_trained(self):
         return self._trained_file.exists()
 
@@ -42,17 +61,19 @@ class ImgRecExperiment(object):
         self.load_dataset()
         self.load_model()
 
-    def load_dataset(self, dataset_name:str='cifar-10'):
-        train_dataset, test_dataset = load_cifar(dataset_name)
-        self.train_loader = DataLoader(train_dataset, 64)
-        self.test_loader = DataLoader(test_dataset, 64)
+    def load_dataset(self):
+        name = self.data_args.get('name')
+        train_dataset, test_dataset = load_cifar(name, self.data_args.get('path'))
+        batch_size = self.train_args.get('batch_size')
+        self.train_loader = DataLoader(train_dataset, batch_size)
+        self.test_loader = DataLoader(test_dataset, batch_size)
 
     def load_model(self):
         model_args = self.config.get('model_args')
         self.model = ShakePyramidNet(
-            depth=model_args.get('depth'),
-            alpha=model_args.get('alpha'),
-            labels=self.num_classes)
+            depth = model_args.get('depth'),
+            alpha = model_args.get('alpha'),
+            label = model_args.get('num_classes'), gpu=self.gpu)
         
         optim_args = self.config.get('optim_args')
         self.optimizer = optim.SGD(self.model.parameters(),
@@ -68,6 +89,7 @@ class ImgRecExperiment(object):
         self.last_step = 0
 
         self.load_last()
+        self.model = self.model.to(self.device)
 
     def make_checkpt(self, train_loss, test_loss):
         step_num = self.last_step
@@ -117,7 +139,9 @@ class ImgRecExperiment(object):
         with tqdm(data_loader, total=len(data_loader)) as data_bar:
             for p, batch in enumerate(data_bar):
                 x, t = batch
-                x, t = x.cuda(), t.cuda()
+                # print(x.shape)
+                # print(t.shape)
+                # x, t = x.cuda(), t.cuda()
                 y = self.model(x)
                 loss = self.loss_func(y, t)
                 loss.backward()
@@ -135,7 +159,7 @@ class ImgRecExperiment(object):
         with tqdm(data_loader, total=len(data_loader)) as data_bar:
             for p, batch in enumerate(data_bar):
                 x, trues = batch
-                x, trues = x.cuda(), trues.cuda()
+                # x, trues = x.cuda(), trues.cuda()
                 preds = self.model(x)
                 loss = self.loss_func(preds, trues)
                 test_loss += loss.item()
@@ -162,6 +186,7 @@ class ImgRecExperiment(object):
         if last_step >= total_steps:
             return
 
+        checkpt_stage = train_args.get('check_point')
         train_loss, test_loss = 0, 0
         for step in range(self.last_step+1, total_steps):
             train_loss = self.train(self.train_loader)
@@ -182,11 +207,10 @@ class ImgRecExperiment(object):
     def evaluate(self):
         preds = self.predict(self.test_loader, get_outs=True)
         labels = self.test_loader.dataset.labels
-        
 
     def _write_trained(self, step):
-        yaml.dump(dict(step=step, stream=self._trained_flag)        
+        yaml.dump(dict(step=step, stream=self._trained_flag))      
 
     def train_mode(self, mode:bool=True):
-        torch.set_grad_enable(mode)
+        torch.set_grad_enabled(mode)
         self.model.train(mode)
