@@ -12,6 +12,7 @@ class SkkScheme(AbstractScheme):
     def __init__(self):
         self.name='skk'
         self.key=np.random.randint(0,(1<<32))
+
     def encrypt(self,img):
         np.random.seed(self.key)
         n=len(img.array)
@@ -32,6 +33,7 @@ class SkkScheme(AbstractScheme):
                 arr[i][j][2]=255^(arr[i][j][2])
             arr[i][j]=np.array(list(permutations(arr[i][j]))[xs])
         return Image(filepath=img.filepath.with_suffix('.skk.jpeg'), nparray=arr)
+
     def decrypt(self,img):
         np.random.seed(self.key)
         n=len(img.array)
@@ -56,12 +58,14 @@ class SkkScheme(AbstractScheme):
             if xb:
                 arr[i][j][2]=255^(arr[i][j][2])
         return Image(nparray=arr)
+
     def save(self,work_dir):
         data={
             'name':self.name,
             'key':self.key
         }
         pickle.dump(data,work_dir / Path(f'{self.name}.scheme.file'))
+        
     @classmethod
     def load(cls,load_file):
         data=_load_file(load_file)
