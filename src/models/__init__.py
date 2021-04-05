@@ -9,6 +9,10 @@ def load_conf(conf_file):
         config = yaml.load(fr)
     return config
 
+def store_conf(config, conf_file):
+    yaml.dump(config, stream=conf_file)
+
+
 class PathFuncs(object):
     @classmethod
     def _path_to_test_score(cls, path):

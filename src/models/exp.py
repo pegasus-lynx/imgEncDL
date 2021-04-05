@@ -3,8 +3,8 @@ from tqdm import tqdm
 import copy
 
 from src import yaml
-from src.models import load_conf
-from src.models.layers.shake_drop import ShakePyramidNet
+from src.models import load_conf, store_conf
+from src.models.shake_drop import ShakePyramidNet
 from src.utils import ensure_dir, ensure_path
 from src.utils.dataloader import DataLoader
 from src.utils.load_cifar import load_cifar
@@ -13,7 +13,8 @@ from src.models import PathFuncs as Pf
 import torch
 import torch.nn as nn
 import torch.optim as optim
-# import torch.backends.cudnn as cudnn
+
+from sklearn.metrics import precision_recall_fscore_support
 
 class ImgRecExperiment(object):
 
@@ -28,6 +29,7 @@ class ImgRecExperiment(object):
         if isinstance(config, str) or isinstance(config, Path):
             config = load_conf(config)
         self.config = config if config else load_conf(self._conf_file)
+        store_conf(config, self.conf_file)
 
         self._trained_file = self.work_dir / '_TRAINED'
 
@@ -139,9 +141,6 @@ class ImgRecExperiment(object):
         with tqdm(data_loader, total=len(data_loader)) as data_bar:
             for p, batch in enumerate(data_bar):
                 x, t = batch
-                # print(x.shape)
-                # print(t.shape)
-                # x, t = x.cuda(), t.cuda()
                 y = self.model(x)
                 loss = self.loss_func(y, t)
                 loss.backward()
@@ -159,7 +158,6 @@ class ImgRecExperiment(object):
         with tqdm(data_loader, total=len(data_loader)) as data_bar:
             for p, batch in enumerate(data_bar):
                 x, trues = batch
-                # x, trues = x.cuda(), trues.cuda()
                 preds = self.model(x)
                 loss = self.loss_func(preds, trues)
                 test_loss += loss.item()
@@ -206,10 +204,13 @@ class ImgRecExperiment(object):
 
     def evaluate(self):
         preds = self.predict(self.test_loader, get_outs=True)
-        labels = self.test_loader.dataset.labels
+        trues = self.test_loader.dataset.labels
+        labels = list(range(self.num_classes))
+        scores = precision_recall_fscore_support(trues, preds, average='macro', labels=labels)
+        return scores
 
     def _write_trained(self, step):
-        yaml.dump(dict(step=step, stream=self._trained_flag))      
+        yaml.dump(dict(step=step), stream=self._trained_flag)      
 
     def train_mode(self, mode:bool=True):
         torch.set_grad_enabled(mode)
