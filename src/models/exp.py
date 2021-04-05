@@ -21,7 +21,7 @@ class ImgRecExperiment(object):
     def __init__(self, work_dir:Path, config=None):
         
         self.work_dir = ensure_dir(work_dir)
-        self.model_dir = self.work_dir / 'models'
+        self.model_dir = ensure_dir(self.work_dir / 'models')
 
         self._conf_file = self.work_dir / 'conf.yml'
         self.score_file = self.model_dir / 'scores.tsv'
@@ -210,7 +210,7 @@ class ImgRecExperiment(object):
         return scores
 
     def _write_trained(self, step):
-        yaml.dump(dict(step=step), stream=self._trained_flag)      
+        yaml.dump(dict(step=step), stream=self._trained_file)      
 
     def train_mode(self, mode:bool=True):
         torch.set_grad_enabled(mode)
