@@ -86,7 +86,7 @@ class ImgRecExperiment(object):
         train_args = self.config.get('train_args')
         steps = train_args.get('steps')
         self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer,
-                                    [steps // 2, (steps * 3) // 4])
+                                    [steps // 4, steps // 2, (steps * 3) // 4])
         self.loss_func = nn.CrossEntropyLoss()
         self.last_step = 0
 
