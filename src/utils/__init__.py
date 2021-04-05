@@ -26,5 +26,9 @@ def _load_file(fpath:Filepath):
         data = pickle.load(fr, encoding='bytes')
     return data
 
+def _dump_file(data, fpath):
+    with open(fpath, 'rb') as fw:
+        pickle.dump(data, fw)
+
 def log(text, tabs:int=0):
     print(f'{"    "*tabs}{text}')

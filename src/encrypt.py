@@ -16,7 +16,7 @@ def parse_args():
                         help='Scheme for encrypting the images')
     parser.add_argument('-b', '--block_shape', type=int, nargs='+', default=(4, 4))
     parser.add_argument('-i', '--image_shape', type=int, nargs='+', default=(32, 32))
-    # parser.add_argument('-n', '--nblocks', type=int, default=64)
+    parser.add_argument('-n', '--nblocks', type=int, default=64)
     return parser.parse_args()
 
 def validate_args(args):
@@ -45,6 +45,8 @@ def main():
     validate_args(args)
 
     log(f'Initializing Scheme : {args.enc_scheme} ...')
+    
+    # nblocks = (image_shape[0] // )
     scheme = SchemeFactory.get_scheme(scheme=args.enc_scheme, 
                                         block_shape=args.block_shape, 
                                         nblocks=args.nblocks)
