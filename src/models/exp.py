@@ -90,7 +90,7 @@ class ImgRecExperiment(object):
 
         self.load_last()
         self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer,
-                                    [steps // 4, steps // 2, (steps * 3) // 4])
+                                    [steps // 2, (steps * 3) // 4])
         self.model = self.model.to(self.device)
 
     def make_checkpt(self, train_loss, test_loss):
