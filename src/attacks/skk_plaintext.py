@@ -100,14 +100,3 @@ class SKKPlainText(object):
         for i in range(3):
             cell[i] = temp[i]
         return cell
-
-    # @classmethod
-    # def match_chosen(cls, cell, chosen, nbits:int=8):
-    #     max_val = (2**nbits)-1
-    #     for x in range(3):
-    #         if cell[x] == (chosen[x] ^ max_val):
-    #             return True
-    #     return False
-
-    # @classmethod
-    # def match_chosen_xor(cls, val, chose)
