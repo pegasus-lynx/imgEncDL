@@ -29,7 +29,7 @@ class ImgRecExperiment(object):
         if isinstance(config, str) or isinstance(config, Path):
             config = load_conf(config)
         self.config = config if config else load_conf(self._conf_file)
-        store_conf(config, self.conf_file)
+        store_conf(config, self._conf_file)
 
         self._trained_file = self.work_dir / '_TRAINED'
 
