@@ -85,12 +85,12 @@ class ImgRecExperiment(object):
                                     nesterov=optim_args.get('nesterov', True))
         train_args = self.config.get('train_args')
         steps = train_args.get('steps')
-        self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer,
-                                    [steps // 4, steps // 2, (steps * 3) // 4])
         self.loss_func = nn.CrossEntropyLoss()
         self.last_step = 0
 
         self.load_last()
+        self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer,
+                                    [steps // 4, steps // 2, (steps * 3) // 4])
         self.model = self.model.to(self.device)
 
     def make_checkpt(self, train_loss, test_loss):
@@ -131,7 +131,7 @@ class ImgRecExperiment(object):
             model_state = state['model_state'] if 'model_state' in state else state
             self.model.load_state_dict(model_state)
             self.model.to(self.device)
-
+            self.last_step = last_step
             optim_state = state['optim_state'] if 'optim_state' in state else None
             if optim_state:
                 self.optimizer.load_state_dict(optim_state)
