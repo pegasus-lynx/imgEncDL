@@ -126,6 +126,7 @@ class ImgRecExperiment(object):
     def load_last(self):
         last_model, last_step = self.get_last_model()
         if last_model:
+            print('Loading previous model :', last_model.name)
             state = torch.load(last_model, map_location=self.device)
             model_state = state['model_state'] if 'model_state' in state else state
             self.model.load_state_dict(model_state)
@@ -147,7 +148,7 @@ class ImgRecExperiment(object):
                 self.optimizer.step()
                 self.optimizer.zero_grad()
                 train_loss += loss.item()
-                msg = f'Batch : {p+1}, Train Loss : {train_loss / (p+1)}'
+                msg = f'Step : {self.last_step} Batch : {p+1}, Train Loss : {train_loss / (p+1)}'
                 data_bar.set_postfix_str(msg, refresh=True)
         return train_loss / len(data_loader)
 
