@@ -39,7 +39,7 @@ class DataLoader(object):
         if curr != 0:
             img_tensor = Cr.list2tensor(images, dtype='float', gpu=self.gpu)
             cls_tensor = Cr.list2tensor(classes, gpu=self.gpu)
-            yield (imgs, classes)
+            yield (img_tensor, cls_tensor)
 
     def _permute(self):
         permutation = random.sample([x for x in range(len(self.dataset))], len(self.dataset))

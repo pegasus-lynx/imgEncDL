@@ -6,6 +6,8 @@ from ..utils import _load_file
 from ..utils.functionals import Transformer
 import numpy as np
 
+from pathlib import Path
+
 class EtCScheme(AbstractScheme):
 
     def __init__(self, block_shape:Union[int, Tuple[int,int]], nblocks:int):
