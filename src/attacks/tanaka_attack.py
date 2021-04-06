@@ -12,19 +12,19 @@ from ..schemes.tanaka import TanakaScheme
 
 class TanakaAttack():
 
-    self.key = load_key(img)
-    n = len(img.array)
-    m = len(img.array[0])
+    def cpa_attack(self, img):
+        n = len(img.array)
+        m = len(img.array[0])
+        self.key =  int(img.fname.split('.')[-2])
 
-    def cpa_attack(self, img, inits):
-        a,b,c = inits
         for i in range(16):
-            help_img = create_helper_image(i)
+            help_img,a,b,c = self.create_helper_image(i)
             ts_obj = TanakaScheme()
             enc_himg = ts_obj.encrypt(help_img)
             arr = deepcopy(enc_himg)
             arr2 = deepcopy(img)
 
+            
             for j,k in product(range(n),range(m)): # Each Pixel
                 for rgb in range(3):  # RGB
                     if arr[j][k][rgb] == 2**8 - a or arr[j][k][rgb] == 2**8 - b or arr[j][k][rgb] == 2**8 - c:

@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from src.schemes import SchemeRegistry, SchemeFactory
-from src.utils import make_dir
+from src.utils import ensure_dir
 from src.utils.dataset import Image, Dataset
 from src import Filepath
 
@@ -42,7 +42,7 @@ def encrypt_image(fname:Filepath, scheme, work_dir:Path):
     img = Image(fname)
     enc_img = scheme.encrypt(img)
     fname = Path(img.fname)
-    # img.save(work_dir / fname.with_suffix('.jpg'))
+    #img.save(work_dir / fname.with_suffix('.jpg'))
     Image.save(enc_img, work_dir / fname.with_suffix(f'.{scheme.name}.jpg'))
 
 def main():
@@ -52,7 +52,7 @@ def main():
     scheme = SchemeFactory.get_scheme(scheme=args.enc_scheme, 
                                         block_shape=args.block_shape, 
                                         nblocks=args.nblocks)
-    work_dir = make_dir(args.work_dir) 
+    work_dir = ensure_dir(args.work_dir) 
 
     if args.img_files:
         for img_file in args.img_files:
@@ -62,7 +62,7 @@ def main():
         pass
 
     if args.img_dir:
-        img_dir = make_dir(work_dir / Path(args.img_dir.name))
+        img_dir = ensure_dir(work_dir / Path(args.img_dir.name))
         images = args.img_dir.glob('*.jpg')
         for image in images:
             encrypt_image(image, scheme, img_dir)
