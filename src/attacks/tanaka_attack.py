@@ -15,12 +15,12 @@ class TanakaAttack():
     def cpa_attack(self, img):
         n = len(img.array)
         m = len(img.array[0])
-        self.key =  int(img.fname.split('.')[-2])
+        key =  int(img.fname.split('.')[-2])
 
         for i in range(16):
             help_img,a,b,c = self.create_helper_image(i)
             ts_obj = TanakaScheme()
-            enc_himg = ts_obj.encrypt_uk(help_img, self.key)
+            enc_himg = ts_obj.encrypt_uk(help_img, key)
             arr = deepcopy(enc_himg)
             arr2 = deepcopy(img)
 
@@ -46,7 +46,7 @@ class TanakaAttack():
                     for i in range(4):
                         for j in range (3):
                             for rgb in range(3):
-                                if helpers_dec[helper_ind, i, j, rgb] == value:
+                                if helpers_dec[helper_ind][i][j][rgb] == value:
                                     i_match = i
                                     j_match = j
                                     rgb_match = rgb
@@ -58,7 +58,7 @@ class TanakaAttack():
 
                         for i_block in range(n//4):
                             for j_block in range(m//4):
-                                attack_dec[4*i_block + i_spot, 4*j_block + j_spot, rgb_spot] = arr2[4*i_block + i_match, 4*j_block + j_match, rgb_match]
+                                attack_dec[ 4*i_block + i_spot][ 4*j_block + j_spot][rgb_spot] = arr2[ 4*i_block + i_match][ 4*j_block + j_match][rgb_match]
 
         return Image(nparray = attack_dec)
 

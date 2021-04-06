@@ -38,7 +38,7 @@ def encrypt_image(fname:Filepath, scheme, work_dir:Path):
     img = Image(fname)
     enc_img = scheme.encrypt(img)
     fname = ensure_path(img.fname)
-    Image.save(enc_img, work_dir / fname.with_suffix(f'.{scheme.name}.jpg'))
+    Image.save(enc_img, work_dir / fname.with_suffix(f'.{enc_img.fname}.jpg'))
 
 def main():
     args = parse_args()

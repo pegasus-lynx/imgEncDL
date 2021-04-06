@@ -21,7 +21,7 @@ class TanakaScheme(AbstractScheme):
 
     def encrypt_uk(self, img, key):
         return self.encrypt_fn(img, key)
-        
+
     def encrypt_fn(self, img, key):
         np.random.seed(self.key)
         n = len(img.array)
@@ -40,7 +40,7 @@ class TanakaScheme(AbstractScheme):
                 temp = arr[i*4 + k][j*4 + l][flip[k][l]]
                 arr[i*4 + k][j*4 + l][flip[k][l]] = arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]]
                 arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]] = temp
-        return Image(filepath = img.filepath.with_suffix(f'.tanaka.{self.key}.jpeg'), nparray = arr)
+        return Image(filepath = img.filepath.with_suffix(f'.{self.key}'),nparray = arr)
 
     def decrypt(self,img):
         np.random.seed(self.key)
@@ -62,14 +62,14 @@ class TanakaScheme(AbstractScheme):
                 temp = arr[i*4 + k][j*4 + l][flip[k][l]]
                 arr[i*4 + k][j*4 + l][flip[k][l]] = arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]]
                 arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]] = temp
-        return Image(filepath = img.filepath.with_suffix('.tanaka.jpeg'), nparray = arr)
+        return Image(filepath = img.filepath.with_suffix(''), nparray = arr)
 
     def save(self,work_dir):
         data = {
             'name':self.name,
             'key':self.key
         }
-        pickle.dump(data,work_dir / Path(f'{self.name}.scheme.file'))
+        #pickle.dump(data,work_dir / Path(f'{self.name}.scheme.file'))
 
     @classmethod
     def load(cls,load_file):
