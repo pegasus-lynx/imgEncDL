@@ -71,9 +71,9 @@ def encrypt_cifar_100(dir_path, scheme, work_dir):
 
 def save_encrypted_dataset(dataset, work_file, keys):
     data = {
-        keys['fnames'].decode('utf-8') : [str(x.filepath.name) for x in dataset.images],
-        keys['datas'].decode('utf-8') : [x.array for x in dataset.images],
-        keys['labels'].decode('utf-8') : dataset.labels
+        keys['fnames'] : [str(x.filepath.name) for x in dataset.images],
+        keys['datas'] : [x.array for x in dataset.images],
+        keys['labels'] : dataset.labels
     }
     _dump_file(data, work_file)
 
@@ -91,7 +91,7 @@ def main():
     scheme = SchemeFactory.get_scheme(scheme=args.enc_scheme, 
                                         block_shape=args.block_shape, 
                                         nblocks=args.nblocks)
-    work_dir = ensure_dir(args.cifar_dir / 'enc.etc') 
+    work_dir = ensure_dir(args.cifar_dir / 'enc.etc.2') 
 
     log(f'Encrypting CIFAR - {args.cifar_type} ...')
     encrypt_cifar(args.cifar_type, args.cifar_dir, scheme, work_dir)

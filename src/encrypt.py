@@ -37,16 +37,14 @@ def encrypt_image(fname:Filepath, scheme, work_dir:Path):
     assert scheme, 'No scheme found.'
     img = Image(fname)
     enc_img = scheme.encrypt(img)
-    fname = ensure_path(img.fname)
-    Image.save(enc_img, work_dir / fname.with_suffix(f'.{enc_img.fname}.jpg'))
+    fname = ensure_path(img.filepath.name)
+    Image.save(enc_img, work_dir / fname.with_suffix(f'.{scheme.name}.jpg'))
 
 def main():
     args = parse_args()
     validate_args(args)
 
-    log(f'Initializing Scheme : {args.enc_scheme} ...')
-    
-    # nblocks = (image_shape[0] // )
+    log(f'Initializing Scheme : {args.enc_scheme} ...')    
     scheme = SchemeFactory.get_scheme(scheme=args.enc_scheme, 
                                         block_shape=args.block_shape, 
                                         nblocks=args.nblocks)

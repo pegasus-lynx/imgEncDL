@@ -1,6 +1,7 @@
 from src.utils.dataset import Image
 from src.utils.random import RandomGen as Rg
 import numpy as np
+from pathlib import Path
 
 class SKKPlainText(object):
 
@@ -11,7 +12,7 @@ class SKKPlainText(object):
 
         max_val = (2**nbits)-1
 
-        himg = cls.get_helper_image()
+        himg = cls.get_helper_image(shape)
         enc_himg = scheme.encrypt(himg)
         
         chosen = himg.array[0,0]
@@ -26,9 +27,9 @@ class SKKPlainText(object):
                         enc_himg.array[r,c,ch] = val ^ max_val
                         val = img.array[r,c,ch]
                         img.array[r,c,ch] = val ^ max_val
-                cell = enc_himg[r,c]
+                cell = enc_himg.array[r,c]
                 pos = cls.get_pos(cell, chosen)
-                img.array[r,c] = cls.permute_cell(img.arra[r,c], pos)
+                img.array[r,c] = cls.permute_cell(img.array[r,c], pos)
         return img
 
     @classmethod
@@ -39,7 +40,7 @@ class SKKPlainText(object):
         for r in range(rows):
             for c in range(cols):
                 array[r,c] = inits
-        himg = Image(nparray=array)
+        himg = Image(filepath=Path('helper_image.jpg'), nparray=array)
         return himg
 
     @classmethod

@@ -32,7 +32,12 @@ class SkkScheme(AbstractScheme):
             if xb:
                 arr[i][j][2]=255^(arr[i][j][2])
             arr[i][j]=np.array(list(permutations(arr[i][j]))[xs])
-        return Image(filepath=img.filepath.with_suffix('.skk.jpeg'), nparray=arr)
+        
+        suf = img.filepath.suffix
+        efp = img.filepath.with_suffix(f'.skk{suf}')
+        enc_img = Image(filepath=efp, nparray=arr)
+        return enc_img
+
 
     def decrypt(self,img):
         np.random.seed(self.key)

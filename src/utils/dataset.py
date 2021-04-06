@@ -4,6 +4,8 @@ import numpy as np
 import pickle
 from pathlib import Path
 from typing import Union, Dict, List, Tuple
+from src import Filepath
+from src.utils import ensure_path, ensure_dir
 from .functionals import Transformer
 
 class Dataset(object):
@@ -54,8 +56,8 @@ class Dataset(object):
         return (img, img_cls)
 
 class Image(object):
-    def __init__(self, filepath:Path=None, nparray=None):
-        self.filepath = filepath
+    def __init__(self, filepath:Filepath=None, nparray=None):
+        self.filepath = ensure_path(filepath)
         self.array = nparray
         self.transforms = []
         if filepath and nparray is None:
