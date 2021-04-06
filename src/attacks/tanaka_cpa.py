@@ -75,7 +75,7 @@ class TanakaAttack():
         i = fix_j // 4
         j = fix_j - i*4
         print(i,j)
-        array[i][j] = inits.toarr()
+        array[i][j] = inits.tolist()
         ints = [1,2,3]
         himg = Image(nparray = array)
         return himg , inits
