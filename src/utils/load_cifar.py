@@ -22,8 +22,6 @@ def load_cifar_10(dir_path:Filepath):
     dir_path = ensure_path(dir_path)
     assert dir_path.exists(), f'Given path  {dir_path} does not exist'
 
-    # img_dir = ensure_dir(dir_path / Path('images'))
-
     meta_file = dir_path / Path('batches.meta')
     meta = _load_file(meta_file)
     label_names = decode_list(meta[b'label_names'])

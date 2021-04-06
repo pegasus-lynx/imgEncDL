@@ -20,6 +20,7 @@ class ImgRecExperiment(object):
 
     def __init__(self, work_dir:Path, config=None):
         
+        self.num_classes = 10
         self.work_dir = ensure_dir(work_dir)
         self.model_dir = ensure_dir(self.work_dir / 'models')
 
@@ -32,7 +33,6 @@ class ImgRecExperiment(object):
         # store_conf(self.config, self._conf_file)
 
         self._trained_file = self.work_dir / '_TRAINED'
-
         self.device, self.gpu = self._set_device()
 
     @property
@@ -117,10 +117,10 @@ class ImgRecExperiment(object):
             text = '\t'.join(cols)
             fw.write(f'{text}\n')
 
-    def get_best_model(self):
+    def get_last_model(self):
         return Pf.get_last_saved_model(self.model_dir)
 
-    def get_last_model(self):
+    def get_best_model(self):
         return Pf.get_best_known_model(self.model_dir)
 
     def load_last(self):
@@ -204,14 +204,14 @@ class ImgRecExperiment(object):
         return
 
     def evaluate(self):
-        preds = self.predict(self.test_loader, get_outs=True)
+        loss, preds = self.predict(self.test_loader, get_outs=True)
         trues = self.test_loader.dataset.labels
         labels = list(range(self.num_classes))
         scores = precision_recall_fscore_support(trues, preds, average='macro', labels=labels)
         return scores
 
     def _write_trained(self, step):
-        yaml.dump(dict(step=step), stream=self._trained_file)      
+        yaml.dump(dict(steps=step), stream=self._trained_file)      
 
     def train_mode(self, mode:bool=True):
         torch.set_grad_enabled(mode)
