@@ -33,7 +33,7 @@ class TanakaScheme(AbstractScheme):
                 temp = arr[i*4 + k][j*4 + l][flip[k][l]]
                 arr[i*4 + k][j*4 + l][flip[k][l]] = arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]]
                 arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]] = temp
-        return Image(filepath = img.filepath.with_suffix('.tanaka.jpeg'), nparray = arr)
+        return Image(filepath = img.filepath.with_suffix(f'.tanaka.{self.key}.jpeg'), nparray = arr)
 
     def decrypt(self,img):
         np.random.seed(self.key)
