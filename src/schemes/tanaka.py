@@ -14,8 +14,15 @@ class TanakaScheme(AbstractScheme):
     def __init__(self):
         self.name = 'tanaka'
         self.key = np.random.randint(0,(1<<16))
-
+    
     def encrypt(self,img):
+        key = np.random.randint(0,(1<<16))
+        return self.encrypt_fn(img, key)
+
+    def encrypt_uk(self, img, key):
+        return self.encrypt_fn(img, key)
+        
+    def encrypt_fn(self, img, key):
         np.random.seed(self.key)
         n = len(img.array)
         m = len(img.array[0])

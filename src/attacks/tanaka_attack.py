@@ -6,9 +6,9 @@ from copy import deepcopy
 from itertools import product
 from src.utils.dataset import Image
 from src.utils.random import RandomGen as Rg
-from ..utils import _load_file
+from src.utils import _load_file
 from pathlib import Path
-from ..schemes.tanaka import TanakaScheme
+from src.schemes.tanaka import TanakaScheme
 
 class TanakaAttack():
 
@@ -20,11 +20,11 @@ class TanakaAttack():
         for i in range(16):
             help_img,a,b,c = self.create_helper_image(i)
             ts_obj = TanakaScheme()
-            enc_himg = ts_obj.encrypt(help_img)
+            enc_himg = ts_obj.encrypt_uk(help_img, self.key)
             arr = deepcopy(enc_himg)
             arr2 = deepcopy(img)
 
-            
+
             for j,k in product(range(n),range(m)): # Each Pixel
                 for rgb in range(3):  # RGB
                     if arr[j][k][rgb] == 2**8 - a or arr[j][k][rgb] == 2**8 - b or arr[j][k][rgb] == 2**8 - c:
