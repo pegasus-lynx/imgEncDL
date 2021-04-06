@@ -5,6 +5,7 @@ from ..utils.dataset import Image
 from ..utils import _load_file
 from ..utils.functionals import Transformer
 import numpy as np
+import pickle
 
 from pathlib import Path
 
@@ -44,15 +45,16 @@ class EtCScheme(AbstractScheme):
         arr = self._merge_blocks(blocks)
         return Image(nparray=arr)
 
-    @classmethod
-    def save(cls, scheme, work_dir):
+    def save(self, work_dir):
         data = {
-            'name' : scheme.name,
-            'nblocks' : scheme.nblocks,
-            'block_shape' : scheme.block_shape,
-            'keys' : scheme.keys 
+            'name' : self.name,
+            'nblocks' : self.nblocks,
+            'block_shape' : self.block_shape,
+            'keys' : self.keys 
         }
-        pickle.dump(data, work_dir / Path(f'{scheme.name}.scheme.file'))
+        filepath = work_dir / Path(f'{self.name}.key.file')
+        with open(filepath, 'wb') as fw:
+            pickle.dump(data, fw)
 
     @classmethod
     def load(cls, load_file):

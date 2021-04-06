@@ -2,10 +2,11 @@ import argparse
 from pathlib import Path
 
 from src.schemes import SchemeRegistry, SchemeFactory
-from src.utils import ensure_dir, ensure_path, log, _dump_file
+from src.utils import ensure_dir, ensure_path, log, _dump_file, _load_file, decode_list
 from src.utils.load_cifar import _load_cifar_datafile
-# from src.utils.dataset import Image
+from src.utils.dataset import Dataset, Image
 from src import Filepath
+import shutil
 
 def parse_args():
     parser = argparse.ArgumentParser(prog='encrypt_cifar', description='Script for \
@@ -28,7 +29,7 @@ def encrypt_cifar_dataset(dataset, scheme, work_dir:Filepath):
     for row in dataset:
         image, label = row
         enc_image = scheme.encrypt(image)
-        enc_image.fname = image.fname
+        enc_image.filepath = image.filepath
         enc_dataset.append(enc_image, label)
     return enc_dataset
 
@@ -36,14 +37,14 @@ def encrypt_cifar_10(dir_path, scheme, work_dir):
     meta_file = dir_path / Path('batches.meta')
     meta = _load_file(meta_file)
     label_names = decode_list(meta[b'label_names'])
-
+    shutil.copy(meta_file, work_dir / Path('batches.meta'))
     keys = {
         'fnames': b'filenames',
         'datas': b'data',
         'labels': b'labels'
     }
 
-    files = dir_path.glob('data_batch*')
+    files = [x for x in dir_path.glob('data_batch*')]
     files.append(dir_path / Path('test_batch'))
     for file in files:
         ds = _load_cifar_datafile(file, keys)
@@ -54,6 +55,7 @@ def encrypt_cifar_100(dir_path, scheme, work_dir):
     meta_file = dir_path / Path('meta')
     meta = _load_file(meta_file)
     label_names = decode_list(meta[f'{label_type}_label_names'.encode()])
+    shutil.copy(meta_file, work_dir / Path('meta'))
 
     keys = {
         'fnames': b'filenames',
@@ -69,8 +71,8 @@ def encrypt_cifar_100(dir_path, scheme, work_dir):
 
 def save_encrypted_dataset(dataset, work_file, keys):
     data = {
-        keys['fnames'].decode('utf-8') : [str(x.fname) for x in dataset],
-        keys['datas'].decode('utf-8') : [x.array for x in dataset],
+        keys['fnames'].decode('utf-8') : [str(x.filepath.name) for x in dataset.images],
+        keys['datas'].decode('utf-8') : [x.array for x in dataset.images],
         keys['labels'].decode('utf-8') : dataset.labels
     }
     _dump_file(data, work_file)
@@ -95,7 +97,7 @@ def main():
     encrypt_cifar(args.cifar_type, args.cifar_dir, scheme, work_dir)
 
     log('Saving the encryption keys')
-    scheme.save(work_dir / Path('key.file'))
+    scheme.save(work_dir)
 
 if __name__ == '__main__':
     main()

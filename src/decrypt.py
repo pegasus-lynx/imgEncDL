@@ -53,7 +53,7 @@ def main():
             decrypt_image(img_file, scheme, work_dir)
 
     if args.img_dir:
-        img_dir = make_dir(work_dir / Path(args.img_dir.name))
+        img_dir = ensure_dir(work_dir / Path(args.img_dir.name))
         log(f'Decrypting Images from dir {args.img_dir} ...')
         images = args.img_dir.glob('*.jpg')
         for image in images:

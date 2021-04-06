@@ -59,7 +59,7 @@ def main():
             encrypt_image(img_file, scheme, work_dir)
 
     if args.img_dir:
-        img_dir = make_dir(work_dir / Path(args.img_dir.name))
+        img_dir = ensure_dir(work_dir / Path(args.img_dir.name))
         log(f'Encrypting Images from dir {args.img_dir} ...')
         images = args.img_dir.glob('*.jpg')
         for image in images:
@@ -67,7 +67,7 @@ def main():
             encrypt_image(image, scheme, img_dir)
 
     log('Saving the encryption keys')
-    scheme.save(work_dir / Path('key.file'))
+    scheme.save(work_dir)
 
 if __name__ == '__main__':
     main()

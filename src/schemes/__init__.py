@@ -35,9 +35,11 @@ class SchemeFactory(object):
         return None
 
     @classmethod
-    def load_scheme(cls, scheme:str=None, key_file:Filepath):
+    def load_scheme(cls, key_file:Filepath=None, scheme:str=None):
         if not scheme or not cls.validate_scheme(scheme):
             print(f'Scheme name {scheme} is not a valid option.')
+        if not key_file.exists():
+            print(f'Key file does not exist')
 
         if scheme == 'ele':
             pass
