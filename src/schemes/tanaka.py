@@ -62,7 +62,7 @@ class TanakaScheme(AbstractScheme):
                 temp = arr[i*4 + k][j*4 + l][flip[k][l]]
                 arr[i*4 + k][j*4 + l][flip[k][l]] = arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]]
                 arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]] = temp
-        return Image(filepath = img.filepath.with_suffix(''), nparray = arr)
+        return Image(nparray = arr)
 
     def save(self,work_dir):
         data = {

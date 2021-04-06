@@ -67,7 +67,7 @@ class TanakaAttack():
 
     @classmethod
     def create_helper_image(cls, fix_j:int, nbits:int=8):
-        array = np.zeros([4,4], dtype=np.long)
+        array = np.zeros([4,4,3], dtype=np.long)
         inits = np.asarray(cls.get_channel_inits(nbits))
         #print(inits.shape)
         rows = 4
