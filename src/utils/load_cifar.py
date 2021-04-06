@@ -80,7 +80,10 @@ def _load_cifar_datafile(fpath:Filepath, keys:Dict[str,ByteString],
     length = len(data[keys['labels']])
     dataset = Dataset()
     for p in range(length):
-        fname = data[keys['fnames']][p].decode('utf-8')
+        try:
+            fname = data[keys['fnames']][p].decode('utf-8')
+        except Exception:
+            fname = data[keys['fnames']][p]
         imgarr = data[keys['datas']][p]
         label = data[keys['labels']][p]
 
