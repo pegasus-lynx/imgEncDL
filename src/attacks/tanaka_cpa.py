@@ -8,6 +8,7 @@ from src.utils.dataset import Image
 from src.utils.random import RandomGen as Rg
 from src.utils import _load_file
 from pathlib import Path
+
 from src.schemes.tanaka import TanakaScheme
 
 class TanakaAttack():
@@ -18,7 +19,8 @@ class TanakaAttack():
         key =  int(img.fname.split('.')[-2])
 
         for i in range(16):
-            help_img,a,b,c = self.create_helper_image(i)
+            help_img,abc = self.create_helper_image(i)
+            a,b,c = abc
             ts_obj = TanakaScheme()
             enc_himg = ts_obj.encrypt_uk(help_img, key)
             arr = deepcopy(enc_himg)
@@ -64,16 +66,19 @@ class TanakaAttack():
 
 
     @classmethod
-    def create_helper_image(cls, fix_j, nbits:int=8):
+    def create_helper_image(cls, fix_j:int, nbits:int=8):
         array = np.zeros([4,4], dtype=np.long)
         inits = np.asarray(cls.get_channel_inits(nbits))
+        #print(inits.shape)
         rows = 4
         cols = 4
         i = fix_j // 4
-        j = fix_j % 4
-        array[i,j] = inits
+        j = fix_j - i*4
+        print(i,j)
+        array[i][j] = inits.toarr()
+        ints = [1,2,3]
         himg = Image(nparray = array)
-        return himg, inits
+        return himg , inits
 
     @classmethod
     def get_channel_inits(cls, nbits:int=8):
@@ -113,3 +118,10 @@ class TanakaAttack():
         name = img.fname
         key = int(name.split('.')[-2])
         return key
+
+
+
+        ##### TESTING
+# pth = "data/sample/mbuntu-8.32.mbuntu-8.32.27306.jpg"
+# ta_obj = TanakaAttack()
+# ta_obj.cpa_attack(pth)

@@ -33,13 +33,13 @@ class TanakaScheme(AbstractScheme):
         #Generating the pixels to be flipped in a box.
         flip = np.random.randint(0, 3, size  =  [4,4])
 
-        arr=deepcopy(img.array)
-
+        arr = deepcopy(img.array)
         for i,j in product(range(n//4),range(m//4)):
             for k,l in product(range(4),range(4)):        
-                temp = arr[i*4 + k][j*4 + l][flip[k][l]]
-                arr[i*4 + k][j*4 + l][flip[k][l]] = arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]]
-                arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]] = temp
+                a = arr[i*4 + k][j*4 + l][flip[k][l]]
+                b = arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]]
+                arr[i*4 + pi_exc_map_x[k][l]][j*4 + pi_exc_map_y[k][l]][flip[k][l]] = a
+                arr[i*4 + k][j*4 + l][flip[k][l]] = b
         return Image(filepath = img.filepath.with_suffix(f'.{self.key}'),nparray = arr)
 
     def decrypt(self,img):
@@ -69,7 +69,7 @@ class TanakaScheme(AbstractScheme):
             'name':self.name,
             'key':self.key
         }
-        #pickle.dump(data,work_dir / Path(f'{self.name}.scheme.file'))
+        #pickle.dump(data,work_dir / Path(f"{self.name}.scheme.file"))
 
     @classmethod
     def load(cls,load_file):
