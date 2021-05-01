@@ -1,5 +1,8 @@
+
 data/*
-!data/sample/
+data/sample/*
+!data/sample/apple/*
+
 *pyc
 
 settings.json

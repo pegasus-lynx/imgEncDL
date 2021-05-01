@@ -2,6 +2,7 @@ from src.utils.dataset import Image
 from src.utils.random import RandomGen as Rg
 import numpy as np
 from pathlib import Path
+from copy import deepcopy
 
 class SKKPlainText(object):
 
@@ -14,6 +15,8 @@ class SKKPlainText(object):
 
         himg = cls.get_helper_image(shape)
         enc_himg = scheme.encrypt(himg)
+
+        dec_img = Image(nparray=deepcopy(img.array))
         
         chosen = himg.array[0,0]
         chosen_xor = chosen ^ ((2**nbits)-1)
@@ -25,17 +28,18 @@ class SKKPlainText(object):
                     if cls.match_with_arr(val, chosen_xor):
                         val = enc_himg.array[r,c,ch]
                         enc_himg.array[r,c,ch] = val ^ max_val
-                        val = img.array[r,c,ch]
-                        img.array[r,c,ch] = val ^ max_val
+                        val = dec_img.array[r,c,ch]
+                        dec_img.array[r,c,ch] = val ^ max_val
                 cell = enc_himg.array[r,c]
                 pos = cls.get_pos(cell, chosen)
-                img.array[r,c] = cls.permute_cell(img.array[r,c], pos)
-        return img
+                dec_img.array[r,c] = cls.permute_cell(dec_img.array[r,c], pos)
+        return dec_img
 
     @classmethod
     def get_helper_image(cls, shape, nbits:int=8):
-        array = np.zeros(shape, dtype=np.long)
-        inits = np.asarray(cls.get_channel_inits(nbits))
+        array = np.zeros(shape, dtype=np.int)
+        # inits = np.asarray(cls.get_channel_inits(nbits))
+        inits = np.asarray([1, 2, 3], dtype=np.int)
         rows, cols, _ = shape
         for r in range(rows):
             for c in range(cols):
@@ -97,7 +101,5 @@ class SKKPlainText(object):
     def permute_cell(cls, cell, pos):
         temp = [0,0,0]
         for i,p in enumerate(pos):
-            temp[i] = cell[p]
-        for i in range(3):
-            cell[i] = temp[i]
-        return cell
+            temp[p] = cell[i]
+        return np.asarray(temp, dtype=np.int)

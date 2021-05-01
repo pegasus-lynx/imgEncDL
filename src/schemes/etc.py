@@ -18,6 +18,7 @@ class EtCScheme(AbstractScheme):
             block_shape = (block_shape, block_shape)
         self.block_shape = block_shape
         self.keys = self._generate_keys()
+        print(max(self.keys['perm']))
 
     def _generate_keys(self, nblocks:int=None):
         keys = dict()
@@ -37,12 +38,12 @@ class EtCScheme(AbstractScheme):
         return Image(filepath=img.filepath.with_suffix('.etc.jpeg'), nparray=arr)
 
     def decrypt(self, img):
-        blocks = self._make_blocks(img.array)
+        blocks, shape = self._make_blocks(img.array)
         blocks = self._rev_shuffle_color(blocks)
         blocks = self._rev_negi(blocks)
         blocks = self._rev_roti(blocks)
         blocks = self._rev_permute(blocks)
-        arr = self._merge_blocks(blocks)
+        arr = self._merge_blocks(blocks, shape)
         return Image(nparray=arr)
 
     def save(self, work_dir):
@@ -86,14 +87,16 @@ class EtCScheme(AbstractScheme):
         arr = np.concatenate(strips, axis=0)
         return arr
 
-    def _permute(self, blocks):
-        return [blocks[p] for p in self.keys['perm']]
+    def _permute(self, blocks, perm=None):
+        if perm is None:
+            perm = self.keys['perm']
+        return [blocks[p] for p in perm]
 
     def _roti(self, blocks):
         tblocks = []
         for key, block in zip(self.keys['roti'], blocks):
             rot, inv = key % 4, key >= 4
-            block = Transformer.rotate(block, angle=rot)
+            block = Transformer.rotate(block, angle=rot*90)
             block = Transformer.reverse(block)
             tblocks.append(block)
         return tblocks
@@ -117,12 +120,12 @@ class EtCScheme(AbstractScheme):
         rev_perm = [0] * self.nblocks
         for ix, p in enumerate(self.keys['perm']):
             rev_perm[p] = ix
-        return self._permute(blocks)
+        return self._permute(blocks, rev_perm)
 
     def _rev_roti(self, blocks):
         tblocks = []
         for key, block in zip(self.keys['roti'], blocks):
-            rot, inv = 3 - (key % 4), key >= 4
+            rot, inv = 4 - (key % 4), key >= 4
             block = Transformer.reverse(block)
             block = Transformer.rotate(block, angle=rot*90)
             tblocks.append(block)
@@ -139,8 +142,8 @@ class EtCScheme(AbstractScheme):
     def _rev_shuffle_color(self, blocks):
         tblocks = []
         for key, block in zip(self.keys['chperm'], blocks):
-            if key in [3,4]:
-                key = 7 - key
+            if key == 4:
+                block = Transformer.channel_permute(block, permute=key)
             block = Transformer.channel_permute(block, permute=key)
             tblocks.append(block)
         return tblocks

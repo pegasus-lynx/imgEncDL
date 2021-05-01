@@ -106,8 +106,8 @@ class Transformer(object):
             narr[2] = arr[2]    
         elif permute == 1:
             narr[0] = arr[0]
-            narr[1] = arr[2]
-            narr[2] = arr[1]    
+            narr[1] = arr[1]
+            narr[2] = arr[2]    
         elif permute == 2:
             narr[0] = arr[1]
             narr[1] = arr[0]

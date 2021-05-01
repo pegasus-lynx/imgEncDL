@@ -1,11 +1,11 @@
 from src.utils.dataset import Image
-
+from copy import deepcopy
 class SKKCipherOnlyBasic(object):
 
     @classmethod
     def attack(cls, img, leading_bit:int=0, nbits:int=8):
         shape = img.shape()
-        array = img.array
+        array = deepcopy(img.array)
         xor_val = (2**nbits) - 1
         rows, cols, channels = shape
         for r in range(rows):
